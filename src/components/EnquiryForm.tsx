@@ -31,10 +31,10 @@ const TRAVELLER_OPTIONS: { label: TravellerType; emoji: string; subtitle: string
 ];
 
 const SERVICE_OPTIONS = [
-  "100% Safe Verified Stay",
-  "Verified Yellow-Board Cab",
-  "24/7 Local Buddy Support",
-  "Secret Spot Itinerary",
+  "100% Verified Stays",
+  "Smooth & Safe Rides",
+  "Always-On Local Buddy Support",
+  "Secret Hidden Spot",
 ];
 
 const DURATION_OPTIONS: DurationType[] = [
@@ -46,8 +46,8 @@ const DURATION_OPTIONS: DurationType[] = [
 export default function EnquiryForm() {
   const [travellerType, setTravellerType] = useState<TravellerType>("Couple");
   const [selectedServices, setSelectedServices] = useState<string[]>([
-    "100% Safe Verified Stay",
-    "Verified Yellow-Board Cab",
+    "100% Verified Stays",
+    "Smooth & Safe Rides",
   ]);
   const [duration, setDuration] = useState<DurationType>("2 Days / 1 Night");
   const [customDuration, setCustomDuration] = useState("");
@@ -90,10 +90,13 @@ export default function EnquiryForm() {
       );
       return false;
     }
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if (!emailRegex.test(email.trim())) {
-      setErrorMessage("Please enter a valid email address (e.g. name@domain.com).");
-      return false;
+    // Email is now optional, validate only if user entered something
+    if (email.trim() !== "") {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(email.trim())) {
+        setErrorMessage("Please enter a valid email address (e.g. rishan@gmail.com).");
+        return false;
+      }
     }
     setErrorMessage(null);
     return true;
@@ -134,16 +137,13 @@ export default function EnquiryForm() {
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
           email: email.trim(),
-          // Arrival date — both keys for GAS compatibility
           arrivalDate: arrivalDate.trim(),
           travelDate: arrivalDate.trim(),
-          // Traveller type — both keys for GAS compatibility
           travellerType,
           groupType: travellerType,
           services: selectedServices,
           duration,
           customDuration: duration === "Custom Duration" ? customDuration.trim() : "",
-          // Special requests — both keys for GAS compatibility
           specialRequests: specialRequests.trim(),
           notes: specialRequests.trim(),
           website_url: websiteUrl,
@@ -333,7 +333,6 @@ export default function EnquiryForm() {
                   })}
                 </div>
 
-                {/* Inline custom duration input if "Custom Duration" is selected */}
                 {duration === "Custom Duration" && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
@@ -385,7 +384,7 @@ export default function EnquiryForm() {
                         required
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        placeholder="Rishan"
+                        placeholder="e.g., Rishan"
                         className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
                       />
                     </div>
@@ -406,26 +405,25 @@ export default function EnquiryForm() {
                         maxLength={10}
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                        placeholder="98100 98100"
+                        placeholder="9810098100"
                         className="w-full px-3 py-2.5 rounded-r-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Email */}
+                {/* Email (Optional) */}
                 <div>
                   <label className="block text-xs font-semibold text-[#1B4D57] mb-1">
-                    Email Address <span className="text-[#D46A43]">*</span>
+                    Email Address <span className="text-[#1B4D57]/50 font-normal">(Optional)</span>
                   </label>
                   <div className="relative">
                     <Mail className="w-4 h-4 absolute left-3 top-3.5 text-[#1B4D57]/40 pointer-events-none" />
                     <input
                       type="email"
-                      required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="name@gmail.com"
+                      placeholder="e.g., rishan@gmail.com"
                       className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
                     />
                   </div>
@@ -495,7 +493,6 @@ export default function EnquiryForm() {
               <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 stroke-[2.2]" />
             </div>
 
-            {/* Prominent FIP-XXXX Enquiry ID Pill Badge */}
             {confirmedEnquiryId && (
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1B4D57] text-[#FDF8EE] text-xs sm:text-sm font-bold tracking-wide mb-3 shadow-md">
                 <Ticket className="w-4 h-4 text-[#D46A43]" />
@@ -511,7 +508,6 @@ export default function EnquiryForm() {
               Thank you, <strong className="text-[#1B4D57] font-bold">{name}</strong>. Our local Pondy team has received your details and will reach out to you soon with your custom safe trip plan.
             </p>
 
-            {/* Quick Trip Summary Card */}
             <div className="w-full bg-[#FDF8EE] rounded-2xl p-4 border border-[#DECBB4] text-left text-xs space-y-2 mb-5">
               <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
                 <span className="text-[#1B4D57]/60">Enquiry ID:</span>
@@ -539,6 +535,12 @@ export default function EnquiryForm() {
                 <span className="text-[#1B4D57]/60">Contact Number:</span>
                 <span className="font-semibold text-[#1B4D57]">+91 {phone}</span>
               </div>
+              {email.trim() && (
+                <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
+                  <span className="text-[#1B4D57]/60">Email:</span>
+                  <span className="font-semibold text-[#1B4D57]">{email}</span>
+                </div>
+              )}
               <div className="flex justify-between pt-0.5">
                 <span className="text-[#1B4D57]/60">Logged Timestamp:</span>
                 <span className="font-medium text-[#1B4D57]/80 text-right">
@@ -547,18 +549,6 @@ export default function EnquiryForm() {
               </div>
             </div>
 
-            {/* Direct Assistance Notice */}
-            <div className="w-full bg-[#3A7D5C]/10 border border-[#3A7D5C]/30 rounded-2xl p-3.5 sm:p-4 mb-5 text-left flex items-start gap-3">
-              <Phone className="w-5 h-5 text-[#3A7D5C] flex-shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-xs font-bold text-[#1B4D57]">Need Immediate Assistance?</h4>
-                <p className="text-[11px] text-[#1B4D57]/70 mt-0.5">
-                  Our on-ground local founders and safety team are on standby 24/7 for direct travel help in Puducherry.
-                </p>
-              </div>
-            </div>
-
-            {/* Submit Another Enquiry Button */}
             <button
               type="button"
               onClick={handleReset}
