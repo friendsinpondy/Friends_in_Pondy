@@ -18,9 +18,11 @@ import {
   RefreshCw,
   Clock,
   Ticket,
+  UserCheck,
 } from "lucide-react";
 
 type TravellerType = "Couple" | "Friends Gang" | "Family" | "Solo Safe";
+type TravellerCount = "1" | "2" | "3" | "4" | "5" | "More than 5";
 type DurationType = "2 Days / 1 Night" | "3 Days / 2 Nights" | "Custom Duration";
 
 const TRAVELLER_OPTIONS: { label: TravellerType; emoji: string; subtitle: string }[] = [
@@ -29,6 +31,8 @@ const TRAVELLER_OPTIONS: { label: TravellerType; emoji: string; subtitle: string
   { label: "Family", emoji: "👨‍👩‍👧‍👦", subtitle: "Safe & Relaxed" },
   { label: "Solo Safe", emoji: "🎒", subtitle: "Verified Peace of Mind" },
 ];
+
+const TRAVELLER_COUNTS: TravellerCount[] = ["1", "2", "3", "4", "5", "More than 5"];
 
 const SERVICE_OPTIONS = [
   "100% Verified Stays",
@@ -45,6 +49,7 @@ const DURATION_OPTIONS: DurationType[] = [
 
 export default function EnquiryForm() {
   const [travellerType, setTravellerType] = useState<TravellerType>("Couple");
+  const [travellerCount, setTravellerCount] = useState<TravellerCount>("2");
   const [selectedServices, setSelectedServices] = useState<string[]>([
     "100% Verified Stays",
     "Smooth & Safe Rides",
@@ -57,7 +62,7 @@ export default function EnquiryForm() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [specialRequests, setSpecialRequests] = useState("");
-  const [websiteUrl, setWebsiteUrl] = useState(""); // Honeypot field for bot protection
+  const [websiteUrl, setWebsiteUrl] = useState(""); // Honeypot
 
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -65,7 +70,6 @@ export default function EnquiryForm() {
   const [confirmedTimestamp, setConfirmedTimestamp] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Today's date for date-picker min attribute
   const todayDateString = new Date().toISOString().split("T")[0];
 
   const toggleService = (service: string) => {
@@ -86,11 +90,10 @@ export default function EnquiryForm() {
     const cleanPhone = phone.replace(/\D/g, "");
     if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
       setErrorMessage(
-        "Please enter a valid 10-digit Indian mobile number (e.g. 9876543210)."
+        "Please enter a valid 10-digit Indian mobile number (e.g. 9810098100)."
       );
       return false;
     }
-    // Email is now optional, validate only if user entered something
     if (email.trim() !== "") {
       const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
       if (!emailRegex.test(email.trim())) {
@@ -106,18 +109,13 @@ export default function EnquiryForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    // Local client-generated fallback ID in FIP-YYYY-XXXX format
     const year = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", year: "numeric" });
     const localEnquiryId = `FIP-${year}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-    // Honeypot check: silently drop bots
     if (websiteUrl) {
       setConfirmedEnquiryId(localEnquiryId);
       setConfirmedTimestamp(
-        new Date().toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          hour12: true,
-        })
+        new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
       setSubmitted(true);
       return;
@@ -129,14 +127,13 @@ export default function EnquiryForm() {
     try {
       const response = await fetch("/api/enquiry", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           enquiryId: localEnquiryId,
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
           email: email.trim(),
+          travellersCount: travellerCount, // New field for Google Sheet column
           arrivalDate: arrivalDate.trim(),
           travelDate: arrivalDate.trim(),
           travellerType,
@@ -153,21 +150,14 @@ export default function EnquiryForm() {
       const data = await response.json();
       setConfirmedEnquiryId(data.enquiryId || localEnquiryId);
       setConfirmedTimestamp(
-        data.timestamp ||
-          new Date().toLocaleString("en-IN", {
-            timeZone: "Asia/Kolkata",
-            hour12: true,
-          })
+        data.timestamp || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
       setSubmitted(true);
     } catch (err) {
-      console.error("Submission network notice:", err);
+      console.error("Submission error:", err);
       setConfirmedEnquiryId(localEnquiryId);
       setConfirmedTimestamp(
-        new Date().toLocaleString("en-IN", {
-          timeZone: "Asia/Kolkata",
-          hour12: true,
-        })
+        new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
       setSubmitted(true);
     } finally {
@@ -194,7 +184,6 @@ export default function EnquiryForm() {
       id="enquiry-card"
       className="relative bg-[#F4E9D8] rounded-3xl p-5 sm:p-7 md:p-8 border-2 border-[#E2D2BC] shadow-vintage overflow-hidden"
     >
-      {/* Decorative Stamp Corner */}
       <div className="absolute -top-10 -right-10 w-28 h-28 rounded-full bg-[#1B4D57]/5 flex items-center justify-center pointer-events-none">
         <Sparkles className="w-8 h-8 text-[#D46A43]/40" />
       </div>
@@ -208,22 +197,22 @@ export default function EnquiryForm() {
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Form Header */}
+            {/* Trust Header: Local Guys instead of Founders */}
             <div className="mb-5 sm:mb-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3A7D5C]/15 border border-[#3A7D5C]/30 text-[#3A7D5C] text-xs font-semibold uppercase tracking-wider mb-2">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Zero Middlemen • 100% Verified
+                Local Trusted Pondy Guys • Zero Middlemen
               </div>
               <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-[#1B4D57] tracking-tight">
                 Plan Your Safe Pondy Trip
               </h3>
               <p className="text-xs sm:text-sm text-[#1B4D57]/70 mt-1 leading-relaxed">
-                Tell us your travel vibe. Our local team prepares your safe stay & cab options within 30 minutes!
+                Managed strictly by local experts. Get verified stays & safe rides within 30 minutes!
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
-              {/* Hidden Honeypot Input for spam bot protection */}
+              {/* Honeypot */}
               <div className="hidden" aria-hidden="true" style={{ display: "none" }}>
                 <input
                   type="text"
@@ -257,6 +246,33 @@ export default function EnquiryForm() {
                       >
                         <span className="text-lg leading-none mb-1">{item.emoji}</span>
                         <span className="font-medium">{item.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Step 1.5: How many members? */}
+              <div>
+                <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1B4D57] mb-2">
+                  <UserCheck className="w-4 h-4 text-[#D46A43]" />
+                  <span>How many members are coming?</span>
+                </label>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+                  {TRAVELLER_COUNTS.map((count) => {
+                    const isSelected = travellerCount === count;
+                    return (
+                      <button
+                        key={count}
+                        type="button"
+                        onClick={() => setTravellerCount(count)}
+                        className={`min-h-[40px] py-2 px-1 rounded-xl text-xs font-bold text-center transition-all cursor-pointer touch-manipulation select-none border ${
+                          isSelected
+                            ? "bg-[#D46A43] text-white border-[#D46A43] shadow-sm scale-105"
+                            : "bg-[#FDF8EE] text-[#1B4D57] border-[#DECBB4] hover:bg-white active:scale-95"
+                        }`}
+                      >
+                        {count}
                       </button>
                     );
                   })}
@@ -306,12 +322,10 @@ export default function EnquiryForm() {
 
               {/* Step 3: Duration & Arrival Date */}
               <div className="space-y-3">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                  <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1B4D57]">
-                    <Calendar className="w-4 h-4 text-[#D46A43]" />
-                    <span>Step 3: Trip Duration & Arrival Date</span>
-                  </label>
-                </div>
+                <label className="flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1B4D57]">
+                  <Calendar className="w-4 h-4 text-[#D46A43]" />
+                  <span>Step 3: Trip Duration & Arrival Date</span>
+                </label>
 
                 <div className="grid grid-cols-3 gap-2">
                   {DURATION_OPTIONS.map((item) => {
@@ -321,10 +335,10 @@ export default function EnquiryForm() {
                         key={item}
                         type="button"
                         onClick={() => setDuration(item)}
-                        className={`min-h-[44px] py-2 px-1 sm:px-2 rounded-xl text-xs text-center transition-all cursor-pointer touch-manipulation select-none border ${
+                        className={`min-h-[44px] py-2 px-1 rounded-xl text-xs text-center transition-all cursor-pointer touch-manipulation select-none border ${
                           isSelected
-                            ? "bg-[#D46A43] text-white border-[#D46A43] font-bold shadow-md scale-[1.02]"
-                            : "bg-[#FDF8EE] text-[#1B4D57] border-[#DECBB4] hover:border-[#D46A43]/50 hover:bg-white active:scale-95"
+                            ? "bg-[#D46A43] text-white border-[#D46A43] font-bold shadow-md"
+                            : "bg-[#FDF8EE] text-[#1B4D57] border-[#DECBB4] hover:bg-white"
                         }`}
                       >
                         <span className="block leading-snug">{item}</span>
@@ -334,24 +348,18 @@ export default function EnquiryForm() {
                 </div>
 
                 {duration === "Custom Duration" && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                  >
-                    <div className="relative">
-                      <Clock className="w-4 h-4 absolute left-3 top-3 text-[#1B4D57]/50" />
-                      <input
-                        type="text"
-                        value={customDuration}
-                        onChange={(e) => setCustomDuration(e.target.value)}
-                        placeholder="Enter your duration (e.g. 4 Days / 3 Nights)"
-                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-xs sm:text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43]"
-                      />
-                    </div>
-                  </motion.div>
+                  <div className="relative">
+                    <Clock className="w-4 h-4 absolute left-3 top-3 text-[#1B4D57]/50" />
+                    <input
+                      type="text"
+                      value={customDuration}
+                      onChange={(e) => setCustomDuration(e.target.value)}
+                      placeholder="Enter duration (e.g. 4 Days / 3 Nights)"
+                      className="w-full pl-9 pr-3 py-2 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-xs sm:text-sm text-[#1B4D57]"
+                    />
+                  </div>
                 )}
 
-                {/* Arrival Date Input */}
                 <div>
                   <label className="block text-xs font-semibold text-[#1B4D57] mb-1">
                     Expected Arrival Date in Pondy
@@ -363,7 +371,7 @@ export default function EnquiryForm() {
                       min={todayDateString}
                       value={arrivalDate}
                       onChange={(e) => setArrivalDate(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-xs sm:text-sm text-[#1B4D57] focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all cursor-pointer"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-xs sm:text-sm text-[#1B4D57] focus:outline-none focus:ring-2 focus:ring-[#D46A43]"
                     />
                   </div>
                 </div>
@@ -385,7 +393,7 @@ export default function EnquiryForm() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="e.g., Rishan"
-                        className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
+                        className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57]"
                       />
                     </div>
                   </div>
@@ -396,7 +404,7 @@ export default function EnquiryForm() {
                       10-Digit Mobile / WhatsApp <span className="text-[#D46A43]">*</span>
                     </label>
                     <div className="relative flex">
-                      <span className="inline-flex items-center px-2.5 rounded-l-xl border border-r-0 border-[#DECBB4] bg-[#FDF8EE] text-xs font-semibold text-[#1B4D57]/70 select-none">
+                      <span className="inline-flex items-center px-2.5 rounded-l-xl border border-r-0 border-[#DECBB4] bg-[#FDF8EE] text-xs font-semibold text-[#1B4D57]/70">
                         +91
                       </span>
                       <input
@@ -406,7 +414,7 @@ export default function EnquiryForm() {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
                         placeholder="9810098100"
-                        className="w-full px-3 py-2.5 rounded-r-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
+                        className="w-full px-3 py-2.5 rounded-r-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57]"
                       />
                     </div>
                   </div>
@@ -424,7 +432,7 @@ export default function EnquiryForm() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="e.g., rishan@gmail.com"
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57]"
                     />
                   </div>
                 </div>
@@ -440,25 +448,23 @@ export default function EnquiryForm() {
                       type="text"
                       value={specialRequests}
                       onChange={(e) => setSpecialRequests(e.target.value)}
-                      placeholder="e.g. Near White Town French colony, private pool, early sunrise trip"
-                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57] placeholder-[#1B4D57]/40 focus:outline-none focus:ring-2 focus:ring-[#D46A43] focus:border-transparent transition-all"
+                      placeholder="e.g. Near White Town, early sunrise trip"
+                      className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#FDF8EE] border border-[#DECBB4] text-sm text-[#1B4D57]"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Error Message */}
               {errorMessage && (
                 <div className="p-3 rounded-xl bg-red-100 border border-red-200 text-red-800 text-xs font-medium">
                   {errorMessage}
                 </div>
               )}
 
-              {/* Submit CTA */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full min-h-[50px] flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-[#D46A43] hover:bg-[#C0562F] text-white font-bold text-base shadow-lg hover:shadow-xl transition-all cursor-pointer touch-manipulation transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full min-h-[50px] flex items-center justify-center gap-2 py-3.5 px-6 rounded-2xl bg-[#D46A43] hover:bg-[#C0562F] text-white font-bold text-base shadow-lg cursor-pointer transition-all"
               >
                 {loading ? (
                   <>
@@ -472,87 +478,27 @@ export default function EnquiryForm() {
                   </>
                 )}
               </button>
-
-              <div className="text-center">
-                <p className="text-[11px] text-[#1B4D57]/70 flex items-center justify-center gap-1">
-                  <span>🔒 Privacy Guarantee:</span> Zero spam. Your details remain 100% confidential.
-                </p>
-              </div>
             </form>
           </motion.div>
         ) : (
-          <motion.div
-            key="success"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4 }}
-            className="py-6 sm:py-8 text-center flex flex-col items-center"
-          >
-            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-[#3A7D5C]/15 border-2 border-[#3A7D5C] flex items-center justify-center text-[#3A7D5C] mb-4 shadow-inner">
-              <CheckCircle2 className="w-10 h-10 sm:w-12 sm:h-12 stroke-[2.2]" />
+          <motion.div key="success" className="py-6 text-center flex flex-col items-center">
+            <div className="w-16 h-16 rounded-full bg-[#3A7D5C]/15 border-2 border-[#3A7D5C] flex items-center justify-center text-[#3A7D5C] mb-4">
+              <CheckCircle2 className="w-10 h-10" />
             </div>
-
             {confirmedEnquiryId && (
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1B4D57] text-[#FDF8EE] text-xs sm:text-sm font-bold tracking-wide mb-3 shadow-md">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1B4D57] text-[#FDF8EE] text-xs font-bold mb-3">
                 <Ticket className="w-4 h-4 text-[#D46A43]" />
                 <span>Enquiry ID: {confirmedEnquiryId}</span>
               </div>
             )}
-
-            <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-[#1B4D57] tracking-tight mb-2">
-              Enquiry Received! 🎉
-            </h3>
-
-            <p className="text-xs sm:text-sm md:text-base text-[#1B4D57]/80 max-w-md mx-auto leading-relaxed mb-5">
-              Thank you, <strong className="text-[#1B4D57] font-bold">{name}</strong>. Our local Pondy team has received your details and will reach out to you soon with your custom safe trip plan.
+            <h3 className="font-playfair text-2xl font-bold text-[#1B4D57] mb-2">Enquiry Received! 🎉</h3>
+            <p className="text-xs sm:text-sm text-[#1B4D57]/80 max-w-md mb-5">
+              Thank you, <strong className="text-[#1B4D57] font-bold">{name}</strong> ({travellerCount} Travellers). Our local team will reach out soon!
             </p>
-
-            <div className="w-full bg-[#FDF8EE] rounded-2xl p-4 border border-[#DECBB4] text-left text-xs space-y-2 mb-5">
-              <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
-                <span className="text-[#1B4D57]/60">Enquiry ID:</span>
-                <span className="font-bold text-[#D46A43]">{confirmedEnquiryId}</span>
-              </div>
-              {arrivalDate && (
-                <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
-                  <span className="text-[#1B4D57]/60">Arrival Date:</span>
-                  <span className="font-semibold text-[#1B4D57]">{arrivalDate}</span>
-                </div>
-              )}
-              <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
-                <span className="text-[#1B4D57]/60">Traveller Vibe:</span>
-                <span className="font-semibold text-[#1B4D57]">{travellerType}</span>
-              </div>
-              <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
-                <span className="text-[#1B4D57]/60">Duration:</span>
-                <span className="font-semibold text-[#1B4D57]">
-                  {duration === "Custom Duration" && customDuration.trim()
-                    ? customDuration.trim()
-                    : duration}
-                </span>
-              </div>
-              <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
-                <span className="text-[#1B4D57]/60">Contact Number:</span>
-                <span className="font-semibold text-[#1B4D57]">+91 {phone}</span>
-              </div>
-              {email.trim() && (
-                <div className="flex justify-between border-b border-[#DECBB4]/60 pb-1.5">
-                  <span className="text-[#1B4D57]/60">Email:</span>
-                  <span className="font-semibold text-[#1B4D57]">{email}</span>
-                </div>
-              )}
-              <div className="flex justify-between pt-0.5">
-                <span className="text-[#1B4D57]/60">Logged Timestamp:</span>
-                <span className="font-medium text-[#1B4D57]/80 text-right">
-                  {confirmedTimestamp}
-                </span>
-              </div>
-            </div>
-
             <button
               type="button"
               onClick={handleReset}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#1B4D57]/30 hover:border-[#1B4D57] text-[#1B4D57] font-semibold text-xs transition-colors hover:bg-white cursor-pointer touch-manipulation active:scale-95"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full border border-[#1B4D57]/30 text-[#1B4D57] font-semibold text-xs hover:bg-white cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
               Submit Another Enquiry
