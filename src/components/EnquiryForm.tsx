@@ -109,11 +109,8 @@ export default function EnquiryForm() {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const year = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", year: "numeric" });
-    const localEnquiryId = `FIP-${year}-${Math.floor(1000 + Math.random() * 9000)}`;
-
     if (websiteUrl) {
-      setConfirmedEnquiryId(localEnquiryId);
+      setConfirmedEnquiryId("FIP-SPAM");
       setConfirmedTimestamp(
         new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
@@ -129,7 +126,6 @@ export default function EnquiryForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          enquiryId: localEnquiryId,
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
           email: email.trim(),
@@ -148,14 +144,16 @@ export default function EnquiryForm() {
       });
 
       const data = await response.json();
-      setConfirmedEnquiryId(data.enquiryId || localEnquiryId);
+      
+      // Catches the Sequential ID generated from Google Sheet backend (e.g., FIP-0001)
+      setConfirmedEnquiryId(data.enquiryId || "FIP-PENDING");
       setConfirmedTimestamp(
         data.timestamp || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
       setSubmitted(true);
     } catch (err) {
       console.error("Submission error:", err);
-      setConfirmedEnquiryId(localEnquiryId);
+      setConfirmedEnquiryId("FIP-SAVED");
       setConfirmedTimestamp(
         new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
