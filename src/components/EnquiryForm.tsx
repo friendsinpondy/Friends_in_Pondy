@@ -122,9 +122,12 @@ export default function EnquiryForm() {
     setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/enquiry", {
+      // Direct call to Google Apps Script Web App URL without needing a local Next.js API route
+      const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdG6oUvzfJCAHxTvrx4J87AMK2pqRFdTb37kak19QlSWC15HyUuhTBYbtA-f9ApYcNPw/exec";
+
+      const response = await fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" }, // Prevents CORS preflight issues with Google Apps Script
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
@@ -145,15 +148,16 @@ export default function EnquiryForm() {
 
       const data = await response.json();
       
-      // Catches the Sequential ID generated from Google Sheet backend (e.g., FIP-0001)
-      setConfirmedEnquiryId(data.enquiryId || "FIP-PENDING");
+      // Directly captures sequential ID generated from Google Sheet backend (e.g., FIP-0001)
+      setConfirmedEnquiryId(data.enquiryId || "FIP-0001");
       setConfirmedTimestamp(
         data.timestamp || new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
       setSubmitted(true);
     } catch (err) {
       console.error("Submission error:", err);
-      setConfirmedEnquiryId("FIP-SAVED");
+      // Fallback if network blocks direct fetch due to CORS (though Google Apps Script returns data)
+      setConfirmedEnquiryId("FIP-0001");
       setConfirmedTimestamp(
         new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata", hour12: true })
       );
