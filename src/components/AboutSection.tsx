@@ -2,32 +2,29 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ShieldCheck, Award, Users, HeartHandshake, CheckCircle2, MapPin, UserCheck } from "lucide-react";
+import { ShieldCheck, Award, Users, HeartHandshake, CheckCircle2, MapPin, Sparkles } from "lucide-react";
 
 export default function AboutSection() {
-  const founders = [
+  const localHighlights = [
     {
-      name: "Mohamed Rishan R",
-      title: "Co-Founder",
-      bio: "Local tech entrepreneur dedicated to eliminating tourist exploitation, verifying transparent logistics, and ensuring round-the-clock safety for all guests in Pondicherry.",
-      badge: "Co-Founder",
-      initials: "MR",
+      title: "100% Native College Students",
+      desc: "Born and raised in Puducherry. We know every hidden cafe, quiet beach, and safe neighborhood like the back of our hand.",
+      badge: "Local Experts",
+      initials: "FP",
       accent: "#1B4D57",
     },
     {
-      name: "Sri Gokul A",
-      title: "Co-Founder",
-      bio: "Heritage enthusiast who personally inspects French Quarter villas and homestays, ensuring strict CCTV coverage, verified caretakers, and authentic quiet locations.",
-      badge: "Co-Founder",
-      initials: "SG",
+      title: "Direct On-Ground Buddies",
+      desc: "No middlemen or fake commission brokers. You deal directly with friendly local guys who are always on standby for you.",
+      badge: "Zero Middlemen",
+      initials: "RM",
       accent: "#D46A43",
     },
     {
-      name: "Peramudhan V",
-      title: "Co-Founder",
-      bio: "Works directly with verified local yellow-board drivers and native homestay hosts to guarantee honest local rates and dependable transit across Puducherry.",
-      badge: "Co-Founder",
-      initials: "PV",
+      title: "Personally Verified Safety",
+      desc: "Every villa, homestay, and yellow-board cab is physically checked by our team to guarantee absolute security for couples & families.",
+      badge: "Strictly Verified",
+      initials: "VS",
       accent: "#3A7D5C",
     },
   ];
@@ -47,7 +44,7 @@ export default function AboutSection() {
     },
     {
       title: "24/7 On-Ground Support",
-      desc: "Direct access to our founders and local travel buddies right here in Pondicherry anytime you need help.",
+      desc: "Direct access to our local travel buddies right here in Pondicherry anytime you need help.",
       icon: Users,
       color: "bg-[#1B4D57]/15 text-[#1B4D57]",
     },
@@ -64,10 +61,10 @@ export default function AboutSection() {
             Our Heritage & Story
           </div>
           <h2 className="font-playfair text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B4D57] tracking-tight">
-            Meet Your Local Pondy Founders
+            Meet Your Local Trusted Pondy Guys
           </h2>
           <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-[#1B4D57]/80 font-normal">
-            We are not an anonymous corporate booking app. We are local students and young entrepreneurs from Puducherry who treat every traveler like family.
+            We are not an anonymous corporate booking app. We are local college students and native entrepreneurs from Puducherry who treat every traveler like family.
           </p>
         </div>
 
@@ -81,7 +78,7 @@ export default function AboutSection() {
                 Why We Started &ldquo;Friends in Pondy&rdquo;
               </span>
               <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-[#1B4D57] leading-snug">
-                Built to protect travelers from fake listings, overpriced autos, and vacation stress.
+                Built by local students to protect travelers from fake listings, overpriced autos, and vacation stress.
               </h3>
               <p className="text-sm sm:text-base text-[#1B4D57]/80 leading-relaxed">
                 Pondicherry is a coastal jewel loved for its French Quarter avenues, serene beaches, and spiritual cafes. But too often, visitors fall victim to inflated broker commissions, uninspected homestays with poor security, and predatory cab pricing.
@@ -131,64 +128,60 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* Co-Founders: STRICTLY LINE-BY-LINE (1 card per row) with Standardized "Co-Founder" title */}
+        {/* Local Trusted Guys Highlights Section (Replacing Individual Founders) */}
         <div className="mb-14 sm:mb-16">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1B4D57]/10 text-[#1B4D57] text-xs font-bold uppercase tracking-wider mb-2">
-              <UserCheck className="w-3.5 h-3.5 text-[#D46A43]" />
-              Co-Founders & Leadership Team
+              <Sparkles className="w-3.5 h-3.5 text-[#D46A43]" />
+              On-Ground Native Experts
             </div>
             <h3 className="font-playfair text-2xl sm:text-3xl font-bold text-[#1B4D57]">
-              The People Standing Behind Your Trip
+              The Local Team Standing Behind Your Trip
             </h3>
             <p className="text-xs sm:text-sm text-[#1B4D57]/70 mt-1 max-w-xl mx-auto">
-              Our three co-founders are on the ground in Puducherry to ensure your trip is seamless, honest, and completely safe.
+              We live right here in Puducherry to ensure your trip is seamless, honest, and completely safe.
             </p>
           </div>
 
-          {/* Strictly Line-by-Line Stack (1 distinct card per row) */}
           <div className="space-y-4 sm:space-y-5 max-w-4xl mx-auto">
-            {founders.map((founder, idx) => (
+            {localHighlights.map((item, idx) => (
               <motion.div
-                key={founder.name}
+                key={item.title}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: idx * 0.1 }}
                 className="bg-[#FDF8EE] rounded-2xl sm:rounded-3xl p-5 sm:p-7 border border-[#E2D2BC] shadow-vintage hover:shadow-vintage-hover transition-all flex flex-col md:flex-row md:items-center justify-between gap-5 group"
               >
-                {/* Left: Avatar & Standardized Co-Founder Title */}
                 <div className="flex items-start sm:items-center gap-4">
                   <div
                     className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl text-white font-playfair font-bold text-lg sm:text-xl flex items-center justify-center shadow-md flex-shrink-0 transition-transform group-hover:scale-105"
-                    style={{ backgroundColor: founder.accent }}
+                    style={{ backgroundColor: item.accent }}
                   >
-                    {founder.initials}
+                    {item.initials}
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2 mb-1">
                       <h4 className="font-playfair text-xl sm:text-2xl font-bold text-[#1B4D57]">
-                        {founder.name}
+                        {item.title}
                       </h4>
                       <span className="text-[10px] sm:text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#3A7D5C]/15 text-[#3A7D5C] border border-[#3A7D5C]/30">
-                        {founder.badge}
+                        {item.badge}
                       </span>
                     </div>
-                    {/* Standardized Title */}
                     <div className="text-xs sm:text-sm font-bold text-[#D46A43] tracking-wide">
-                      {founder.title}
+                      100% Native & Verified Support
                     </div>
                   </div>
                 </div>
 
-                {/* Right: Bio & Location */}
                 <div className="md:max-w-md lg:max-w-lg md:text-left border-t md:border-t-0 md:border-l border-[#DECBB4]/80 pt-3 md:pt-0 md:pl-6">
                   <p className="text-xs sm:text-sm text-[#1B4D57]/75 leading-relaxed">
-                    {founder.bio}
+                    {item.desc}
                   </p>
                   <div className="mt-2.5 flex items-center gap-4 text-[11px] font-semibold text-[#1B4D57]/65">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-[#D46A43]" /> Puducherry Resident
+                      <MapPin className="w-3 h-3 text-[#D46A43]" /> Puducherry Based
                     </span>
                     <span className="text-[#3A7D5C] flex items-center gap-1">
                       ● Active On-Ground
