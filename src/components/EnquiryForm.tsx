@@ -133,7 +133,7 @@ export default function EnquiryForm() {
           name: name.trim(),
           phone: phone.replace(/\D/g, ""),
           email: email.trim(),
-          travellersCount: travellerCount, // New field for Google Sheet column
+          travellersCount: travellerCount,
           arrivalDate: arrivalDate.trim(),
           travelDate: arrivalDate.trim(),
           travellerType,
@@ -197,7 +197,7 @@ export default function EnquiryForm() {
             exit={{ opacity: 0, y: -15 }}
             transition={{ duration: 0.3 }}
           >
-            {/* Trust Header: Local Guys instead of Founders */}
+            {/* Trust Header */}
             <div className="mb-5 sm:mb-6">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3A7D5C]/15 border border-[#3A7D5C]/30 text-[#3A7D5C] text-xs font-semibold uppercase tracking-wider mb-2">
                 <ShieldCheck className="w-3.5 h-3.5" />
@@ -493,7 +493,7 @@ export default function EnquiryForm() {
             )}
             <h3 className="font-playfair text-2xl font-bold text-[#1B4D57] mb-2">Enquiry Received! 🎉</h3>
             <p className="text-xs sm:text-sm text-[#1B4D57]/80 max-w-md mb-5">
-              Thank you, <strong className="text-[#1B4D57] font-bold">{name}</strong> ({travellerCount} Travellers). Our local team will reach out soon!
+              Thank you, <strong className="text-[#1B4D57] font-bold">{name}</strong> ({travellerCount} Travellers • {travellerType}). Our local team will reach out soon!
             </p>
             <button
               type="button"
