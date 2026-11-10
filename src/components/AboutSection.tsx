@@ -10,21 +10,21 @@ export default function AboutSection() {
       title: "100% Native College Students",
       desc: "Born and raised in Puducherry. We know every hidden cafe, quiet beach, and safe neighborhood like the back of our hand.",
       badge: "Local Experts",
-      initials: "FP",
+      emoji: "🎓",
       accent: "#1B4D57",
     },
     {
       title: "Direct On-Ground Buddies",
       desc: "No middlemen or fake commission brokers. You deal directly with friendly local guys who are always on standby for you.",
       badge: "Zero Middlemen",
-      initials: "RM",
+      emoji: "🤝",
       accent: "#D46A43",
     },
     {
       title: "Personally Verified Safety",
       desc: "Every villa, homestay, and yellow-board cab is physically checked by our team to guarantee absolute security for couples & families.",
       badge: "Strictly Verified",
-      initials: "VS",
+      emoji: "🛡️",
       accent: "#3A7D5C",
     },
   ];
@@ -128,7 +128,7 @@ export default function AboutSection() {
           </div>
         </div>
 
-        {/* Local Trusted Guys Highlights Section (Replacing Individual Founders) */}
+        {/* Local Trusted Guys Highlights Section */}
         <div className="mb-14 sm:mb-16">
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1B4D57]/10 text-[#1B4D57] text-xs font-bold uppercase tracking-wider mb-2">
@@ -155,10 +155,10 @@ export default function AboutSection() {
               >
                 <div className="flex items-start sm:items-center gap-4">
                   <div
-                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl text-white font-playfair font-bold text-lg sm:text-xl flex items-center justify-center shadow-md flex-shrink-0 transition-transform group-hover:scale-105"
+                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl text-2xl sm:text-3xl flex items-center justify-center shadow-md flex-shrink-0 transition-transform group-hover:scale-105"
                     style={{ backgroundColor: item.accent }}
                   >
-                    {item.initials}
+                    {item.emoji}
                   </div>
                   <div>
                     <div className="flex flex-wrap items-center gap-2 mb-1">
